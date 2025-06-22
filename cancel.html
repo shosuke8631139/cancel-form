@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ご予約のキャンセル</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="cancel.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page-container">
+        <header>
+            <h1>ご予約のキャンセル</h1>
+            <p>予約時のお名前、日付、開始時間をご入力ください。</p>
+        </header>
+
+        <main>
+            <form id="cancel-form">
+                <div class="form-group">
+                    <label for="name">お名前 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" placeholder="例：山田 花子" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">予約日 <span class="required">*</span></label>
+                    <input type="text" id="date" name="date" placeholder="日付を選択してください" required>
+                </div>
+                <div class="form-group">
+                    <label for="startTime">開始時間 <span class="required">*</span></label>
+                    <select id="startTime" name="startTime" required>
+                        <!-- 時間オプションはJSで動的に生成 -->
+                    </select>
+                </div>
+                <button type="submit">この内容でキャンセルする</button>
+            </form>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+    <script src="cancel.js"></script>
+</body>
+</html>

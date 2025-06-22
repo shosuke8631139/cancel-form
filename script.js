@@ -70,7 +70,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function closeModal() {
         modal.style.display = 'none';
+
+        // フォームと確認メッセージの状態をリセット
+        const confirmationMessageEl = document.getElementById('confirmation-message');
+        modalForm.style.display = 'block';
+        confirmationMessageEl.style.display = 'none';
+        confirmationMessageEl.innerHTML = '';
         modalForm.reset();
+
+        // 送信ボタンを元の状態に戻す
+        const submitButton = modalForm.querySelector('button');
+        submitButton.disabled = false;
+        submitButton.textContent = 'この内容で予約する';
     }
 
     closeModalBtn.onclick = closeModal;
@@ -89,11 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
-
             const startDate = selectedInfo.start;
             const endDate = selectedInfo.end;
 
-            // Google Apps Scriptに送信するデータ
             const reservationData = {
                 date: `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`,
                 startTime: `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`,
@@ -105,35 +114,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const gasUrl = 'https://script.google.com/macros/s/AKfycbw8NFcaLOtYElMgabkFPUlO8K1uVGMbe9sCqxxOOdzeKXX_UWjObeKzBpXMG56b0cIx/exec';
 
-            // fetchを使用してGASにPOSTリクエストを送信
             await fetch(gasUrl, {
                 method: 'POST',
-                mode: 'no-cors', // CORSエラーを回避するため、リクエストを送信するのみでレスポンスは取得しない
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8',
-                },
-                body: JSON.stringify(reservationData) // GAS側で e.postData.contents をJSON.parse()で受け取る
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(reservationData)
             });
 
-            // no-corsモードではレスポンスを確認できないため、エラーなく完了すれば成功とみなす
             console.log('予約データが送信されました:', reservationData);
 
-            // カレンダーにイベントを追加
-            const newEvent = {
+            calendar.addEvent({
                 title: `予約：${name}`,
                 start: selectedInfo.startStr,
                 end: selectedInfo.endStr,
-            };
-            calendar.addEvent(newEvent);
+            });
 
-            closeModal();
-            alert('ご予約が完了しました！');
+            // フォームを非表示にし、確認メッセージを表示
+            const confirmationMessageEl = document.getElementById('confirmation-message');
+            confirmationMessageEl.innerHTML = `
+                <h2>✅ 予約が完了しました！</h2>
+                <p>以下の内容で予約を受け付けました：</p>
+                <div class="confirm-details">
+                    <p><strong>日付：</strong> ${reservationData.date}</p>
+                    <p><strong>時間：</strong> ${reservationData.startTime} 〜 ${reservationData.endTime}</p>
+                    <p><strong>お名前：</strong> ${reservationData.name}</p>
+                </div>
+            `;
+            modalForm.style.display = 'none';
+            confirmationMessageEl.style.display = 'block';
 
         } catch (error) {
             console.error('予約送信エラー:', error);
             alert('予約の送信に失敗しました。ネットワーク接続を確認するか、時間をおいて再度お試しください。');
-        } finally {
-            // ボタンを元に戻す
+            // エラーが発生した場合はボタンを元に戻す
             submitButton.disabled = false;
             submitButton.textContent = 'この内容で予約する';
         }
